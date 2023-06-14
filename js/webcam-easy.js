@@ -41,7 +41,7 @@ class Webcam {
       });
       if(this._webcamList.length == 1){
         this._facingMode = 'user';
-      }    
+      }
       return this._webcamList;
     }
 
@@ -60,11 +60,11 @@ class Webcam {
         return constraints;
     }
 
-    /* Select camera based on facingMode */ 
+    /* Select camera based on facingMode */
     selectCamera(){
       for(let webcam of this._webcamList){
         if(   (this._facingMode=='user' && webcam.label.toLowerCase().includes('front'))
-          ||  (this._facingMode=='enviroment' && webcam.label.toLowerCase().includes('back'))
+          ||  (this._facingMode=='environment' && webcam.label.toLowerCase().includes('back'))
         )
         {
           this._selectedDeviceId = webcam.deviceId;
@@ -73,21 +73,21 @@ class Webcam {
       }
     }
 
-    /* Change Facing mode and selected camera */ 
+    /* Change Facing mode and selected camera */
     flip(){
-      this._facingMode = (this._facingMode == 'user')? 'enviroment': 'user';
+      this._facingMode = (this._facingMode == 'user')? 'environment': 'user';
       this._webcamElement.style.transform = "";
-      this.selectCamera();  
+      this.selectCamera();
     }
 
     /*
       1. Get permission from user
       2. Get all video input devices info
-      3. Select camera based on facingMode 
+      3. Select camera based on facingMode
       4. Start stream
     */
     async start(startStream = true) {
-      return new Promise((resolve, reject) => {         
+      return new Promise((resolve, reject) => {
         this.stop();
         navigator.mediaDevices.getUserMedia(this.getMediaConstraints()) //get permisson from user
           .then(stream => {
@@ -106,7 +106,7 @@ class Webcam {
                 }else{
                     resolve(this._selectedDeviceId);
                 }
-              }) 
+              })
               .catch(error => {
                 reject(error);
               });
@@ -117,23 +117,23 @@ class Webcam {
       });
     }
 
-    /* Get all video input devices info */ 
+    /* Get all video input devices info */
     async info(){
-      return new Promise((resolve, reject) => {            
+      return new Promise((resolve, reject) => {
         navigator.mediaDevices.enumerateDevices()
           .then(devices =>{
             this.getVideoInputs(devices);
             resolve(this._webcamList);
-          }) 
+          })
           .catch(error => {
             reject(error);
           });
       });
     }
-  
-    /* Start streaming webcam to video element */ 
+
+    /* Start streaming webcam to video element */
     async stream() {
-      return new Promise((resolve, reject) => {         
+      return new Promise((resolve, reject) => {
         navigator.mediaDevices.getUserMedia(this.getMediaConstraints())
           .then(stream => {
               this._streamList.push(stream);
@@ -151,13 +151,13 @@ class Webcam {
       });
     }
 
-    /* Stop streaming webcam */ 
+    /* Stop streaming webcam */
     stop() {
       this._streamList.forEach(stream => {
         stream.getTracks().forEach(track => {
           track.stop();
         });
-      });   
+      });
     }
 
     snap() {
@@ -180,5 +180,5 @@ class Webcam {
       else{
         throw "canvas element is missing";
       }
-    } 
+    }
 }
