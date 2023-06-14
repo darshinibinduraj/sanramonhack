@@ -276,7 +276,7 @@
   background-color: transparent;
   position: absolute;
   width: auto;
-  height: 100vh;
+  height: 100%;
   z-index: 9999;
   margin: auto;
   top: 0;

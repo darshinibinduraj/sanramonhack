@@ -1,6 +1,6 @@
 // TODO: Set the below credentials
-const CLIENT_ID = '476357969685-j6fbau0unnuhkkkjld1p8401ganmf7pm.apps.googleusercontent.com';
-const API_KEY = '6vaCs5EMMbjlJ6Eoz-mJu8Za';
+const CLIENT_ID = '483843549561-c4thk9hm4td736jj9icpqomcgll8fv8q.apps.googleusercontent.com';
+const API_KEY = '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';
 
 // Discovery URL for APIs used by the quickstart
 const DISCOVERY_DOC = 'https://www.googleapis.com/discovery/v1/apis/drive/v3/rest';
@@ -11,8 +11,8 @@ let tokenClient;
 let gapiInited = false;
 let gisInited = false;
 
-document.getElementById('authorize_button').style.visibility = 'hidden';
-document.getElementById('signout_button').style.visibility = 'hidden';
+//document.getElementById('authorize_button').style.visibility = 'hidden';
+//document.getElementById('signout_button').style.visibility = 'hidden';
 
 /**
  * Callback after api.js is loaded.
@@ -52,20 +52,27 @@ function gisLoaded() {
  */
 function maybeEnableButtons() {
 	if (gapiInited && gisInited) {
-		document.getElementById('authorize_button').style.visibility = 'visible';
+		//document.getElementById('authorize_button').style.visibility = 'visible';
 	}
 }
 
 /**
  *  Sign in the user upon button click.
  */
-function handleAuthClick() {
+function handleAuthClick(syncResult) {
 	tokenClient.callback = async (resp) => {
 		if (resp.error !== undefined) {
 			throw (resp);
 		}
-		document.getElementById('signout_button').style.visibility = 'visible';
-		document.getElementById('authorize_button').value = 'Refresh';
+		//document.getElementById('signout_button').style.visibility = 'visible';
+		//document.getElementById('authorize_button').value = 'Refresh';
+		if (!syncResult)
+		{
+			uploadFileBase64();
+		}else
+		{
+			openImage();
+		}
 	};
 
 	if (gapi.client.getToken() === null) {
@@ -88,8 +95,8 @@ function handleSignoutClick() {
 		gapi.client.setToken('');
 		document.getElementById('content').style.display = 'none';
 		document.getElementById('content').innerHTML = '';
-		document.getElementById('authorize_button').value = 'Authorize';
-		document.getElementById('signout_button').style.visibility = 'hidden';
+		//document.getElementById('authorize_button').value = 'Authorize';
+		//document.getElementById('signout_button').style.visibility = 'hidden';
 	}
 }
 
@@ -105,6 +112,84 @@ async function handleUpload()
     }
 }
 
+
+
+// Upload Base64 encoded image to Google Drive
+async function uploadFileBase64() {
+
+  const link = document.getElementById('download-photo');
+  const href = link.getAttribute('href');
+
+  const base64Data = href;
+  const fileName = 'image.png'; // Set the desired file name
+
+  const metadata = {
+    name: fileName,
+    mimeType: 'image/png',
+    parents:  ['1igHRt59wd1mzZq-0pyjFppRIQXh3dKQD']
+  };
+
+  const fileData = base64Data.split(',')[1];
+  const byteCharacters = atob(fileData);
+  const byteArrays = [];
+  for (let offset = 0; offset < byteCharacters.length; offset += 512) {
+    const slice = byteCharacters.slice(offset, offset + 512);
+
+    const byteNumbers = new Array(slice.length);
+    for (let i = 0; i < slice.length; i++) {
+      byteNumbers[i] = slice.charCodeAt(i);
+    }
+
+    const byteArray = new Uint8Array(byteNumbers);
+    byteArrays.push(byteArray);
+  }
+
+  const blob = new Blob(byteArrays, { type: metadata.mimeType });
+
+  const reader = new FileReader();
+  reader.onloadend = (e) => {
+    const content = e.target.result;
+
+    const fileMetadata = {
+      name: fileName,
+      mimeType: metadata.mimeType,
+      parents:  ['1igHRt59wd1mzZq-0pyjFppRIQXh3dKQD']
+    };
+
+    const accessToken = gapi.auth.getToken().access_token;
+
+    const form = new FormData();
+    form.append('metadata', new Blob([JSON.stringify(fileMetadata)], { type: 'application/json' }));
+    form.append('file', blob);
+
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', 'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart');
+    xhr.setRequestHeader('Authorization', 'Bearer ' + accessToken);
+    xhr.onreadystatechange = () => {
+      if (xhr.readyState === XMLHttpRequest.DONE) {
+        if (xhr.status === 200) {
+          const response = JSON.parse(xhr.responseText);
+          console.log('File uploaded successfully. File ID:', response.id);
+
+          document.getElementById('content').innerHTML = "File uploaded successfully. The Google Drive file id is <b>" + xhr.response.id + "</b>";
+		  document.getElementById('content').style.display = 'block';
+
+			setTimeout(openImage, 10000);
+          //var exit_app = document.getElementById('exit-app');
+          //exit_app.click();
+        } else {
+			document.getElementById('content').innerHTML = "File uploaded failed." + xhr.statusText + "</b>";
+			document.getElementById('content').style.display = 'block';
+            console.error('Error uploading file:', xhr.statusText);
+        }
+      }
+    };
+    xhr.send(form);
+  };
+
+  reader.readAsDataURL(blob);
+}
+
 /**
  * Upload file to Google Drive.
  */
@@ -112,8 +197,16 @@ async function uploadFile(file) {
 	var metadata = {
 	   name: file.name,
 	   mimeType: file.type,
-	   parents:  ['1XVLt-fQZwgK0JJAVZqdUpPy43aAUFn5O']
+	   parents:  ['1igHRt59wd1mzZq-0pyjFppRIQXh3dKQD']
 	};
+
+  const permissions = {
+    role: 'writer',
+    type: 'anyone',
+    allowFileDiscovery: false,
+    additionalRoles: ['delete']
+  };
+
 /*	var fileContent = 'Hello World'; // As a sample, upload a text file.
 	var file = new Blob([fileContent], { type: 'text/plain' });
 	var metadata = {
@@ -141,7 +234,7 @@ async function uploadFile(file) {
 }
 
 async function handleDeleteFilesClick() {
-  var folderId = '1X9ScTYO478C9OnzyG9OA3cUIfSona6t3';
+  var folderId = '1qeZ2dHlRLAZfhjNZsnuyEIREh6W8hNMv';
 
   gapi.client.drive.files.list({
     q: "'" + folderId + "' in parents",
@@ -185,7 +278,7 @@ function openImage()
 
 function checkDownload(timeout,callBack) {
     var startTime = Date.now();
-    var folderId = '1X9ScTYO478C9OnzyG9OA3cUIfSona6t3';
+    var folderId = '1qeZ2dHlRLAZfhjNZsnuyEIREh6W8hNMv';
 	function handleOpenImageClick() {
 	  var imageContainer = document.getElementById('image-container');
 	  gapi.client.drive.files.list({
@@ -199,24 +292,44 @@ function checkDownload(timeout,callBack) {
 		  files.forEach(function(file) {
 		   console.log("downloaded: " + file.id);
 		   var fileId = file.id;
-		  	isImage(fileId, function(isImg){
-			   if (isImg)
-			   {
-		  		   var webViewLink = file.webViewLink;
-		  		   var imageUrl = webViewLink.replace(/\/file\/d\/(.*)\/view.*/, '/uc?id=$1');
-		  		   imageContainer.src = imageUrl;
-		       } else
-		       {
-					getFileContent(fileId, function(content) {
-						try {
-						  var jsonObject = JSON.parse(content);
-						  console.log('JSON object:', jsonObject);
-						} catch (error) {
-						  console.error('Error parsing JSON:', error);
-						}
-					});
-			   }
-		    });
+		   var extension = file.name.split('.').pop();
+
+		   if (extension.toUpperCase() != "JSON")
+		   {
+		  	   var webViewLink = file.webViewLink;
+		  	   var imageUrl = webViewLink.replace(/\/file\/d\/(.*)\/view.*/, '/uc?id=$1');
+		  	   //imageContainer.src = imageUrl;
+		  	   const canvas = document.getElementById('canvas');
+  			   const context = canvas.getContext('2d');
+
+
+				// Create a new image element
+				const image = new Image();
+				// Set the source of the image
+				image.src = imageUrl;
+
+			  //canvas.width = image.width;
+			  //canvas.height = image.height;
+
+ 				// Clear the canvas
+  				//context.clearRect(0, 0, canvas.width, canvas.height);
+
+  				//context.scale(-1, 1);
+  				context.drawImage(image, 0, 0);
+
+				$('#exampleModal').show();
+
+		   } else
+		   {
+				getFileContent(fileId, function(content) {
+				try {
+					  var jsonObject = JSON.parse(content);
+					  console.log('JSON object:', jsonObject);
+					} catch (error) {
+					  console.error('Error parsing JSON:', error);
+					}
+				});
+		   }
 	     });
 		 callBack(true);
 		}else

@@ -19,16 +19,16 @@ $("#webcam-switch").change(function () {
                 displayError();
             });
     }
-    else {        
+    else {
         cameraStopped();
         webcam.stop();
         console.log("webcam stopped");
-    }        
+    }
 });
 
 $('#cameraFlip').click(function() {
     webcam.flip();
-    webcam.start();  
+    webcam.start();
 });
 
 $('#closeError').click(function() {
@@ -53,7 +53,7 @@ function cameraStarted(){
         $("#cameraFlip").removeClass('d-none');
     }
     $("#wpfront-scroll-top-container").addClass("d-none");
-    window.scrollTo(0, 0); 
+    window.scrollTo(0, 0);
     $('body').css('overflow-y','hidden');
 }
 
@@ -78,11 +78,11 @@ $("#take-photo").click(function () {
 
 function beforeTakePhoto(){
     $('.flash')
-        .show() 
-        .animate({opacity: 0.3}, 500) 
+        .show()
+        .animate({opacity: 0.3}, 500)
         .fadeOut(500)
         .css({'opacity': 0.7});
-    window.scrollTo(0, 0); 
+    window.scrollTo(0, 0);
     $('#webcam-control').addClass('d-none');
     $('#cameraControls').addClass('d-none');
 }
@@ -95,6 +95,10 @@ function afterTakePhoto(){
     $('#download-photo').removeClass('d-none');
     $('#resume-camera').removeClass('d-none');
     $('#cameraControls').removeClass('d-none');
+    $('#upload-photo').removeClass('d-none');
+	$('#refresh').removeClass('d-none');
+	$('#sign-out').removeClass('d-none');
+	$('#sync-result').removeClass('d-none');
 }
 
 function removeCapture(){
@@ -105,6 +109,10 @@ function removeCapture(){
     $('#exit-app').addClass('d-none');
     $('#download-photo').addClass('d-none');
     $('#resume-camera').addClass('d-none');
+    $('#upload-photo').addClass('d-none');
+    $('#refresh').addClass('d-none');
+    $('#sign-out').addClass('d-none');
+    $('#sync-result').addClass('d-none');
 }
 
 $("#resume-camera").click(function () {
