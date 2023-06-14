@@ -228,9 +228,7 @@
  #cameraFlip {
   width: 70px;
     height: 55px;
-    margin-left: 40px;
-    margin-top: -10px;
-    position: absolute;
+    position: relative;
     cursor: pointer;
     background-color: black;
     background-position: center center;
