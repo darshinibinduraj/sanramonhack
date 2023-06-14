@@ -133,8 +133,8 @@
   #webcam{
     display: block;
     position: relative;
-    width: auto;
-    height: 100%;
+    width: 100%;
+    height: auto;
     z-index: 999;
     pointer-events: none;
     margin: auto;
@@ -275,8 +275,8 @@
 #canvas{
   background-color: transparent;
   position: absolute;
-  width: auto;
-  height: 100%;
+  width: 100%;
+  height: auto;
   z-index: 9999;
   margin: auto;
   top: 0;
