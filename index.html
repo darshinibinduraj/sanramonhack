@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>CO2AI</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" type="text/css" href="css/style.css" />
+<link rel="stylesheet" type="text/css" href="css/form.css" />
+<link rel='stylesheet' type='text/css' media='screen' href='css/webcam.css'>
+<link rel="icon" href="data:;base64,iVBORw0KGgo=">
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<style>
+#content {
+    display: none;
+}
+</style>
+</head>
+<body>
+    <!--Add HTML buttons to sign in and sign out-->
+    <div class="phppot-container">
+
+        <h1>CO2AI</h1>
+        <div>
+            <div class="row">
+ 				<input type="file" id="file-input" accept="image/*" capture="camera">
+                <input type="button" id="authorize_button"
+                    onclick="handleAuthClick()" value="Authorize">
+                <input type="button" id="authorize_button"
+                    onclick="handleUpload()" value="Upload">
+                <input
+                    type="button" id="signout_button"
+                    onclick="handleSignoutClick()" value="Sign Out">
+                <img src="" id="image-container"/>
+
+
+            </div>
+        </div>
+        <div id="content" class="success message"><?php if(isset($message)) { echo $message; } ?></div>
+    </div>
+
+	<main id="webcam-app">
+        <div class="form-control webcam-start" id="webcam-control">
+                <label class="form-switch">
+                <input type="checkbox" id="webcam-switch">
+                <i></i>
+                <span id="webcam-caption">Click to Start Camera</span>
+                </label>
+                <button id="cameraFlip" class="btn d-none"></button>
+        </div>
+
+        <div id="errorMsg" class="col-12 col-md-6 alert-danger d-none">
+            Fail to start camera, please allow permision to access camera. <br/>
+            If you are browsing through social media built in browsers, you would need to open the page in Sarafi (iPhone)/ Chrome (Android)
+            <button id="closeError" class="btn btn-primary ml-3">OK</button>
+        </div>
+        <div class="md-modal md-effect-12">
+            <div id="app-panel" class="app-panel md-content row p-0 m-0">
+                <div id="webcam-container" class="webcam-container col-12 d-none p-0 m-0">
+                    <video id="webcam" autoplay playsinline width="640" height="480"></video>
+                    <canvas id="canvas" class="d-none"></canvas>
+                    <div class="flash"></div>
+                    <audio id="snapSound" src="audio/snap.wav" preload = "auto"></audio>
+                </div>
+                <div id="cameraControls" class="cameraControls">
+                    <a href="#" id="exit-app" title="Exit App" class="d-none"><i class="material-icons">exit_to_app</i></a>
+                    <a href="#" id="take-photo" title="Take Photo"><i class="material-icons">camera_alt</i></a>
+                    <a href="#" id="download-photo" download="selfie.png" target="_blank" title="Save Photo" class="d-none"><i class="material-icons">file_download</i></a>
+                    <a href="#" id="resume-camera"  title="Resume Camera" class="d-none"><i class="material-icons">camera_front</i></a>
+                </div>
+            </div>
+        </div>
+        <div class="md-overlay"></div>
+    </main>
+    <script type="text/javascript" src="./js/gapi-upload.js"></script>
+    <script async defer src="https://apis.google.com/js/api.js"
+        onload="gapiLoaded()"></script>
+    <script async defer src="https://accounts.google.com/gsi/client"
+        onload="gisLoaded()"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="./js/webcam-easy.js"></script>
+    <script src='./js/app.js'></script>
+</body>
+</html>
